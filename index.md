@@ -8,8 +8,8 @@ title: Home
     <div class="hero-kicker">CCP-NTH Training Programme</div>
     <h1>AI for Nuclear Thermal Hydraulics Summer School</h1>
     <p>
-      A 5-day, in-person summer school introducing machine learning as a practical engineering tool
-      for nuclear thermal hydraulics.
+      A 5-day, in-person summer school introducing machine learning as a careful engineering tool
+      for nuclear thermal hydraulics, with pre-work provided before Day 1.
     </p>
     <div class="hero-actions">
       <a class="button button-primary" href="{{ '/programme.html' | relative_url }}">View Programme</a>
@@ -46,6 +46,11 @@ title: Home
       for nuclear thermal hydraulics, with emphasis on problem framing, correct workflow,
       validation, uncertainty, domain validity, and safe use.
     </p>
+    <p>
+      The week combines morning lectures with guided afternoon practical sessions built around a
+      shared Critical Heat Flux case study. The focus is on methods that can be taught carefully,
+      run on standard laptops, and interpreted responsibly in an engineering setting.
+    </p>
 
     <div class="grid grid-3">
       <div class="card">
@@ -58,7 +63,7 @@ title: Home
       </div>
       <div class="card">
         <h3>Decision Support</h3>
-        <p>Uncertainty quantification, model validity, and optimisation workflows for engineering decision-making.</p>
+        <p>Uncertainty-aware decision support, model validity checks, and optimisation workflows for engineering use.</p>
       </div>
     </div>
   </section>
@@ -87,12 +92,12 @@ title: Home
   <section class="section">
     <h2>Weekly Structure</h2>
     <div class="grid grid-3">
+      <div class="card"><h3>Pre-Work</h3><p>Self-learning onboarding pack for environment checks, dataset orientation, and domain-validity terminology before Day 1.</p></div>
       <div class="card"><h3>Day 1</h3><p>Problem framing, supervised ML, workflow discipline, and baseline models.</p></div>
-      <div class="card"><h3>Day 2</h3><p>Random Forest, Gradient Boosting, model comparison, and regime-wise diagnostics.</p></div>
-      <div class="card"><h3>Day 3</h3><p>Surrogate modelling, Gaussian Processes, uncertainty, and extrapolation tests.</p></div>
-      <div class="card"><h3>Day 4</h3><p>Neural networks for tabular data and lightweight physics-guided guardrails.</p></div>
-      <div class="card"><h3>Day 5</h3><p>VVUQ, uncertainty-aware decisions, optimisation, guest talks, and closing discussion.</p></div>
-      <div class="card"><h3>Day 0</h3><p>Self-learning onboarding pack to verify environment, notebooks, and datasets.</p></div>
+      <div class="card"><h3>Day 2</h3><p>Tree ensembles for engineering tabular data, model comparison, and regime-wise diagnostics.</p></div>
+      <div class="card"><h3>Day 3</h3><p>Surrogate modelling, Gaussian Processes, uncertainty, and extrapolation-aware reasoning.</p></div>
+      <div class="card"><h3>Day 4</h3><p>Neural networks for tabular engineering data, limits, and lightweight physics-guided guardrails.</p></div>
+      <div class="card"><h3>Day 5</h3><p>VVUQ, safe optimisation for decision support, guest talks, programme synthesis, and closing discussion.</p></div>
     </div>
   </section>
 
@@ -107,13 +112,14 @@ title: Home
   </section>
 
   <section class="section">
-    <h2>Logos and Sponsors</h2>
-    <p>Replace the placeholder logo in <code>assets/logo.svg</code>, or add additional logos below.</p>
+    <h2>Partners and Supporting Organisations</h2>
     <div class="logo-row">
-      <img src="assets/logo.svg" alt="AI4NTH logo" width="180">
-      <div class="logo-placeholder">Add CCP-NTH logo</div>
-      <div class="logo-placeholder">Add STFC logo</div>
-      <div class="logo-placeholder">Add partner logos</div>
+      <div class="logo-card"><img src="{{ '/assets/ccp-nth-logo-new-long.png' | relative_url }}" alt="CCP-NTH logo"></div>
+      <div class="logo-card"><img src="{{ '/assets/Cosec_Logo.png' | relative_url }}" alt="COSEC logo"></div>
+      <div class="logo-card"><img src="{{ '/assets/Imperial_College_London_new_logo.png' | relative_url }}" alt="Imperial College London logo"></div>
+      <div class="logo-card"><img src="{{ '/assets/uom_logo_big.gif' | relative_url }}" alt="University of Manchester logo"></div>
+      <div class="logo-card"><img src="{{ '/assets/stfc_logo.png' | relative_url }}" alt="STFC logo"></div>
+      <div class="logo-card"><img src="{{ '/assets/Sheffield.jpg' | relative_url }}" alt="The University of Sheffield logo"></div>
     </div>
   </section>
 
