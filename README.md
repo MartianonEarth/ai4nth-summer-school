@@ -50,7 +50,20 @@ Dataset contributions should go under `datasets/`. Do not add large datasets or 
 
 ### How to Contribute or Upload Materials
 
-Use this structure when adding new teaching content:
+Only repository maintainers with write access should push directly to this repository. Other contributors should use a fork and pull request workflow.
+
+Recommended contribution workflow:
+
+1. Fork the repository on GitHub.
+2. Clone your fork locally.
+3. Create a new branch, for example `materials/day2-tree-models` or `lecturer/your-name-session`.
+4. Add or update materials in the appropriate folders.
+5. Commit your changes with a clear commit message.
+6. Push the branch to your fork.
+7. Open a pull request back to `CCP-NTH/ai4nth-summer-school`.
+8. In the pull request description, summarise what was added, any software requirements, dataset/licence notes, and whether the material can be public after the school.
+
+Use this repository structure when adding new teaching content:
 
 1. Choose the correct day folder in `course_materials/`.
 2. Add lecture slides to `slides/`.
