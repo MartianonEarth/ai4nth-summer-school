@@ -1,0 +1,264 @@
+---
+title: DRG Quarto Reveal Template
+subtitle: And layout guide
+filters:
+  - _extensions/drg-theme/direct_css.lua
+format:
+  drg-theme-revealjs: default
+author: Tim Rogers
+date: last-modified
+html-math-method:  
+    method: mathjax
+    url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+
+---
+
+## Intro
+
+```{python}
+# | echo: false
+
+from jax import vmap
+from jax import config
+from jax import numpy as jnp
+from jax import random as jr
+from jax.scipy.linalg import solve_triangular
+
+from typing import NamedTuple
+
+from matplotlib import pyplot as plt
+
+plt.rc("font", size=40)
+plt.rc("xtick", labelsize=30)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=30)  # Size of the y-tick labels
+plt.rc("lines", markersize=12)
+
+config.update("jax_enable_x64", True)
+key = jr.key(0)
+NUGGET = 1e-7
+```
+
+:::{.v-center .incremental}
+- Why do we build surrogates/emulators?
+- Problems you might have with emulators?
+  - You don't know if it matches the simulator
+  - You don't know how much data you need to fit it
+  - You **know** it won't be perfect but how bad is it?
+- In the end emulation is just a special use of regression (**personal viewpoint**)
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+def cov(kernel):
+    return vmap(vmap(kernel.k, in_axes=(None, 0)), in_axes=(0, None))
+
+
+class SE(NamedTuple):
+    sf2: float
+    ll: float
+
+    def k(self, xp, xq):
+        return self.sf2 * jnp.exp(-((xp - xq) ** 2).sum() / 2 / self.ll)
+
+
+N = 300
+sn2 = 1e-3
+x = jnp.linspace(-3.0, 3.0, N)
+sf2 = 3.0
+ll = 1.0
+kern = SE(sf2, ll)
+kxx = cov(kern)(x, x)
+L = jnp.linalg.cholesky(kxx + NUGGET * jnp.identity(N))
+
+y = L @ jr.normal(jr.key(0), (N,))
+
+_, key = jr.split(key)
+idxs = jr.choice(key, N, (8,))
+
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "bo")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_lin = jnp.hstack((x[:, None], jnp.ones_like(x[:, None])))
+y_lin = X_lin @ jnp.linalg.solve(X_lin[idxs].T @ X_lin[idxs], X_lin[idxs].T @ y[idxs])
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_quad = jnp.hstack((x[:, None] ** 2, x[:, None], jnp.ones_like(x[:, None])))
+y_quad = X_quad @ jnp.linalg.solve(
+    X_quad[idxs].T @ X_quad[idxs], X_quad[idxs].T @ y[idxs]
+)
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.plot(x, y_quad)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_ten = x[:, None] ** jnp.arange(7)[None]
+y_ten = X_ten @ jnp.linalg.solve(
+    X_ten[idxs].T @ X_ten[idxs] + 1e-3 * jnp.identity(X_ten.shape[1]),
+    X_ten[idxs].T @ y[idxs],
+)
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.plot(x, y_quad)
+plt.plot(x, y_ten)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+ys = []
+
+for _ in range(30):
+    _, key = jr.split(key)
+    lli = jnp.exp(jr.uniform(key, minval=jnp.log(0.1), maxval=jnp.log(2.0)))
+    kern = SE(sf2, lli)
+    kt = cov(kern)(x[idxs], x[idxs]) + sn2 * jnp.identity(idxs.shape[0])
+    lt = jnp.linalg.cholesky(kt + NUGGET * jnp.identity(idxs.shape[0]))
+    ksx = cov(kern)(x, x[idxs])
+    m = ksx @ solve_triangular(
+        lt, solve_triangular(lt, y[idxs], lower=True), lower=True, trans=True
+    )
+    r = solve_triangular(lt, ksx.T, lower=True)
+    v = cov(kern)(x, x) - (r.T @ r) + NUGGET * jnp.identity(N)
+    # v = jnp.diag(jnp.diag(v))
+    _, key = jr.split(key)
+    ys.append(m[:, None] + jnp.linalg.cholesky(v) @ jr.normal(key, (N, 1)))
+ys = jnp.array(ys).transpose((1, 0, 2)).reshape((N, -1))
+
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, ys, "k", alpha=0.3)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+## What we want
+
+:::{.v-center}
+- Can we avoid needing to pick a basis?
+- Can we find a way to cover the possibility of all these functions?
+- Can we know the width of possibilities at any point in space?
+- Is there a principled way to avoid needing to fit an infinite number of functions?
+
+:::
+
+
+## The Gaussian Process
+
+::: {font-size=70px}
+::: {.callout-tip}
+## Gaussian Process
+
+A probability distribution where every sample is a function, fully defined by a **mean function** $m(x)$ and **covariance function** or *kernel* $k(x,x^\prime)$.
+
+$$
+f(x) \sim \mathcal{GP}(m(x), k(x,x^\prime))
+$$
+
+:::
+
+:::
+
+This lets us define a way to learn a whole *distribution* of functions rather than just a single "line-of-best-fit".
+
+
+## A GP on Training Data
+
+Another definition of the GP is that it is a multivariate Gaussian over infinite dimensions.
+
+
+::: {.fragment}
+
+Since any finite subset of a multivariate Gaussian is marginally also a multivariate Gaussian, we only need to work with these.
+
+:::
+
+
+::: {.fragment}
+
+If I have training data $\mathcal{D}=\{x_i, y_i\}_{i=1}^N$ and $y_i = f(x_i) + e_i$ with $e_i \sim \mathcal{N}(0, \sigma_n^2)$ then
+
+:::
+
+
+::: {.fragment}
+
+$$
+\mathbf{y} = \mathcal{N}\left(m(\mathbf{x}), K_{ff} + \sigma_n^2 \mathbb{I}\right)
+$$
+
+N.B. $\left[K_{ff}\right]_{ij} = k(x_i,x_j)$
+
+:::
