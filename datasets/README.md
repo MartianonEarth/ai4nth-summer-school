@@ -14,8 +14,7 @@ If a notebook asks you to choose or inspect a dataset, use the file names below.
 | `chf_val.csv` | Organiser-defined validation split for the CHF case study |
 | `chf_test.csv` | Organiser-defined test split for the CHF case study |
 | `chf_GP.csv` | Gaussian-process subset used in surrogate-modelling sessions |
-| `chf_ong.csv` | Original larger CHF dataset (**more than 24,000 data points**) with reference-source information.
-You do not need to use this file for the standard practical exercises unless instructed to do so. It is mainly included as a reference dataset. |
+| `chf_ong.csv` | Original larger CHF dataset (**more than 24,000 data points**) with reference-source information. You do not need to use this file for the standard practical exercises unless instructed to do so. It is mainly included as a reference dataset. |
 | `chf_OOD_Kim2000.csv` | Out-of-domain CHF data source |
 | `chf_OOD_Lee1966.csv` | Out-of-domain CHF data source |
 | `chf_OOD_Peterlongo1966.csv` | Out-of-domain CHF data source |
