@@ -16,5 +16,7 @@ dependencies:
   - pyyaml
   - pytorch-cpu
   - pip
+  - xgboost
+  - lightgbm
   - pip:
       - mapie
