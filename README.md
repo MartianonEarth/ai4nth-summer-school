@@ -1,100 +1,181 @@
-# AI for Nuclear Thermal Hydraulics Summer School
+# AI for Nuclear Thermal Hydraulics (AI4NTH) Summer School
 
-This repository supports the **AI for Nuclear Thermal Hydraulics Summer School**. It contains the public event website, lecturer guidance, teaching materials, environment setup files and dataset documentation.
+Welcome to the **AI for Nuclear Thermal Hydraulics (AI4NTH) Summer School** repository.
 
-## Open the Website
+This repository contains the public website, software environment, datasets, lecture materials, Jupyter notebooks, and hands-on materials used throughout the summer school.
 
-- [Summer school homepage](https://ccp-nth.github.io/ai4nth-summer-school/)
-- [Programme](https://ccp-nth.github.io/ai4nth-summer-school/programme.html)
-- [Registration](https://ccp-nth.github.io/ai4nth-summer-school/registration.html)
-- [Contact](https://ccp-nth.github.io/ai4nth-summer-school/contact.html)
-- [Lecturer Guidance](https://ccp-nth.github.io/ai4nth-summer-school/lecturer_guidance.html)
-- [Teaching Materials](https://ccp-nth.github.io/ai4nth-summer-school/materials.html)
+---
 
-## Repository Map
+# Summer School Website
 
-- `website/` — public website pages: home, programme, registration, contact, lecturer guidance and materials overview.
-- `_layouts/` — Jekyll layout used by the website.
-- `assets/` — website images and CSS.
-- `environment/` — Python/Jupyter setup files for course notebooks.
-- `datasets/` — dataset documentation, metadata and planned split locations.
-- `course_materials/` — slides, notebooks, exercises and solutions organised by day.
-- `instructors/` — templates and checklists for lecturer contributions.
+The latest participant information is available on the public website.
 
-## Guidance for Lecturers
+| Page | Link |
+|------|------|
+| Home | https://ccp-nth.github.io/ai4nth-summer-school/ |
+| Programme | https://ccp-nth.github.io/ai4nth-summer-school/programme.html |
+| Registration | https://ccp-nth.github.io/ai4nth-summer-school/registration.html |
+| Practical Information | https://ccp-nth.github.io/ai4nth-summer-school/practical_information.html |
+| Teaching Materials Overview | https://ccp-nth.github.io/ai4nth-summer-school/materials.html |
+| Contact | https://ccp-nth.github.io/ai4nth-summer-school/contact.html |
+| Lecturer Guidance | https://ccp-nth.github.io/ai4nth-summer-school/lecturer_guidance.html |
 
-Lecturers should use the templates in `instructors/` when preparing materials:
+---
 
-- `instructors/lecturer_materials_checklist.md`
-- `instructors/session_brief_template.md`
-- `instructors/software_requirements_template.md`
-- `instructors/practical_outputs_template.md`
+# Before the Summer School
 
-Please add teaching materials to the relevant day folder under `course_materials/`:
+Please complete the following steps before arriving.
 
-- `slides/` for presentation files
-- `notebooks/` for runnable Jupyter notebooks
-- `exercises/` for student-facing practical tasks
-- `solutions/` for reference solutions or expected outputs
+## Step 1 - Read the Programme and Practical Information
 
-Before submitting materials:
+First, read the programme so you understand the course structure and topics:
 
-- Keep notebooks runnable on standard laptops.
-- Avoid unnecessary package dependencies.
-- Document extra software requirements in the session README or instructor template.
-- Include expected practical outputs such as plots, metrics tables or saved artefacts.
-- Flag likely student difficulties.
-- State whether materials can be made public after the school.
+https://ccp-nth.github.io/ai4nth-summer-school/programme.html
 
-Dataset contributions should go under `datasets/`. Do not add large datasets or files with unclear licensing. Add metadata, source, licence, target variable, feature descriptions and split information before release.
+Then read the practical information page for venue, accommodation, lunch, transport, and computing setup details:
 
-### How to Contribute or Upload Materials
+https://ccp-nth.github.io/ai4nth-summer-school/practical_information.html
 
-Only repository maintainers with write access should push directly to this repository. Other contributors should use a fork and pull request workflow.
+---
 
-Recommended contribution workflow:
+## Step 2 - Set Up Your Laptop
 
-1. Fork the repository on GitHub.
-2. Clone your fork locally.
-3. Create a new branch, for example `materials/day2-tree-models` or `lecturer/your-name-session`.
-4. Add or update materials in the appropriate folders.
-5. Commit your changes with a clear commit message.
-6. Push the branch to your fork.
-7. Open a pull request back to `CCP-NTH/ai4nth-summer-school`.
-8. In the pull request description, summarise what was added, any software requirements, dataset/licence notes, and whether the material can be public after the school.
+Go to:
 
-Use this repository structure when adding new teaching content:
+```text
+environment/
+```
 
-1. Choose the correct day folder in `course_materials/`.
-2. Add lecture slides to `slides/`.
-3. Add practical notebooks to `notebooks/`.
-4. Add student exercises to `exercises/`.
-5. Add worked solutions or expected outputs to `solutions/`.
-6. Update that day's `README.md` with any special software, data, timing or practical-output notes.
-7. Add dataset files or metadata under `datasets/` only when release permissions and licences are clear.
-8. Use the templates in `instructors/` to describe the session, software requirements and expected lab outputs.
+Then follow:
 
-If material is not ready for public release, record that clearly in the lecturer checklist and keep private files out of the public repository until release is approved.
+```text
+environment/README.md
+```
 
-## Guidance for Students
+The setup guide will help you to:
 
-Students should start with the public website:
+- install the required software;
+- create the course Conda environment;
+- start JupyterLab;
+- verify that everything is working correctly.
 
-1. Read the [programme](https://ccp-nth.github.io/ai4nth-summer-school/programme.html).
-2. Complete any onboarding or pre-work material when it becomes available.
-3. Follow the setup instructions in `environment/installation.md`.
-4. Use `course_materials/` for day-by-day notebooks, exercises and slides.
-5. Use `datasets/` only as documented by the notebooks and instructors.
+The official supported setup route is **Conda**.
 
-The course is designed for standard laptops. If a notebook needs extra packages or non-standard software, that requirement should be documented in the relevant day folder.
+---
 
-## Website Updates
+## Step 3 - Verify Your Environment
 
-Website source pages live in `website/`. The public URLs are controlled by each page's Jekyll `permalink` field, so source files can remain grouped while the website still publishes clean root-level links.
+Run:
 
-When updating the website:
+```text
+environment/00_environment_check.ipynb
+```
 
-- Edit the relevant Markdown file in `website/`.
-- Keep navigation changes in `_layouts/default.html`.
-- Keep images and CSS in `assets/`.
-- Avoid moving existing public URLs unless redirects or permalink updates are also handled.
+before arriving.
+
+If all checks pass successfully, your laptop is ready for the practical sessions.
+
+If you experience any problems, please contact the organisers before the course rather than spending too long debugging on your own.
+
+---
+
+## Step 4 - Complete the Day 0 Self-learning
+
+Once your software environment is working, complete the Day 0 onboarding materials.
+
+Go to:
+
+```text
+course_materials/day0_onboarding/
+```
+
+Read:
+
+```text
+course_materials/day0_onboarding/README.md
+```
+
+Then complete:
+
+```text
+course_materials/day0_onboarding/Day0_self_learning_onboarding.ipynb
+```
+
+This introduces the case study, datasets, notebook structure, and workflow used throughout the week.
+
+---
+
+## Step 5 - During the Summer School
+
+Teaching materials are organised by day under:
+
+```text
+course_materials/
+```
+
+The main student-facing files for each day are kept directly in that day's folder so they are easy to find. Some day folders also contain `exercises/`, `solutions/`, `slides/`, or `notebooks/` subfolders as placeholders or for material that needs to be separated.
+
+Datasets used throughout the course are located under:
+
+```text
+datasets/
+```
+
+Please use the datasets only as instructed in the notebooks or by the teaching team.
+
+---
+
+# Repository Overview
+
+| Path | Purpose |
+|------|---------|
+| `environment/` | Software setup, Conda environment, and environment verification notebook |
+| `course_materials/` | Day-by-day student materials and practical resources |
+| `course_materials/day0_onboarding/` | Day 0 setup, dataset orientation, and self-learning onboarding |
+| `course_materials/day1_foundations/` | Day 1 baseline workflow and foundational modelling material |
+| `course_materials/day2_tree_models/` | Day 2 tree-based models |
+| `course_materials/day3_surrogates_gp/` | Day 3 surrogate modelling and Gaussian Processes |
+| `course_materials/day4_neural_networks/` | Day 4 neural networks |
+| `course_materials/day5_vvuq_optimisation/` | Day 5 VVUQ and optimisation |
+| `datasets/` | Datasets used during the course |
+| `datasets/chf_case_study/` | Metadata and documentation for the CHF case study |
+| `instructors/` | Lecturer templates and organiser guidance |
+| `website/` | Source Markdown files for the GitHub Pages website |
+| `assets/` | Website images and CSS |
+| `_layouts/` | GitHub Pages layout templates |
+
+---
+
+# For Lecturers and Contributors
+
+If you are preparing teaching materials or contributing to this repository, please see:
+
+**[CONTRIBUTING.md](CONTRIBUTING.md)**
+
+The contributing guide explains:
+
+- repository structure;
+- where teaching materials should be uploaded;
+- GitHub workflow;
+- pull request process;
+- datasets;
+- website updates;
+- software requirements.
+
+---
+
+# Contact
+
+For questions about the summer school, please contact:
+
+**Dr Wei Wang**
+
+STFC Daresbury Laboratory
+
+wei.wang@stfc.ac.uk
+
+**Dr Yu Duan**
+
+University of Sheffield / Imperial College London
+
+yu.duan@sheffield.ac.uk

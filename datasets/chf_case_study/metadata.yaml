@@ -1,20 +1,26 @@
 name: CHF case study dataset
 description: Structured thermal-hydraulics dataset used for the AI4NTH Summer School.
-status: placeholder
-source: To be confirmed
-licence: To be confirmed
-target_variable: To be confirmed
+status: release candidate
+source: U.S. Nuclear Regulatory Commission (NRC) / Groeneveld et al. (2006)
+licence: CC0-1.0
+target_variable: CHF (kW/m^2)
 features:
   - name: pressure
-    unit: To be confirmed
+    unit: kPa
   - name: mass_flux
-    unit: To be confirmed
+    unit: kg/m^2/s
   - name: quality
-    unit: To be confirmed
+    unit: NA
 splits:
-  train: splits/train.csv
-  validation: splits/validation.csv
-  test: splits/test.csv
-  unsafe_domain: splits/unsafe_domain.csv
+  train: ../chf_train.csv
+  validation: ../chf_val.csv
+  test: ../chf_test.csv
+  gp_subset: ../chf_GP.csv
+  main_export: ../chf_ong.csv
+  out_of_domain:
+    - ../chf_OOD_Kim2000.csv
+    - ../chf_OOD_Lee1966.csv
+    - ../chf_OOD_Peterlongo1966.csv
 notes:
-  - Replace this file with confirmed dataset metadata before release.
+  - Confirm source and licence before public release.
+  - Keep notebook paths aligned with the top-level datasets directory.

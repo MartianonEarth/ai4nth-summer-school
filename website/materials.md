@@ -26,12 +26,6 @@ The repository is structured to support reusable, reproducible course delivery. 
 - `course_materials/day4_neural_networks/`
 - `course_materials/day5_vvuq_optimisation/`
 
-Each day folder contains:
+Released notebooks, slides, PDFs and HTML tools are placed directly in the relevant day folder. Exercise and solution subfolders are available where a session needs separate practical tasks or reference outputs.
 
-- `slides/`
-- `notebooks/`
-- `exercises/`
-- `solutions/`
-- `README.md`
-
-Materials are placeholders until lecturer content and release permissions are confirmed.
+Materials remain subject to lecturer content checks and release permissions.

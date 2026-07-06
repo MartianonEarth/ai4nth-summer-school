@@ -1,17 +1,24 @@
 # Day 0: Onboarding
 
-## Session title
+This folder contains the self-learning preparation material for Day 0.
 
-Onboarding and setup
+## What Students Should Do
 
-## Expected materials to add
+1. Make sure you have already followed `../../environment/README.md`.
+2. Start JupyterLab from the repository root or from the Conda environment described in `environment/README.md`.
+3. Open `Day0_self_learning_onboarding.ipynb`.
+4. Run all cells in order.
+5. Check that you can load the dataset files and produce the simple plots in the notebook.
 
-- `slides/` — orientation slides and setup overview
-- `notebooks/` — environment-check notebooks
-- `exercises/` — setup and warm-up exercises
-- `solutions/` — reference outputs for setup checks
+If all cells run successfully, you have the available tools ready for the summer school.
 
-## Notes for lecturers
+## Material In This Folder
+
+- `Day0_self_learning_onboarding.ipynb` - self-learning setup and dataset-orientation notebook.
+
+## For Lecturers
+
+This section is for lecturers and organisers.
 
 - Keep notebooks runnable on standard laptops.
 - Avoid unnecessary package dependencies.

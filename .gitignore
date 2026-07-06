@@ -1,11 +1,8 @@
 # Packed conda environments - too large for normal GitHub commits
-env/*.tar.gz
-env/*.zip
-portable_env/
+environment/*.tar.gz
+environment/*.zip
 
 # Large binary files - do not commit to regular Git
-env/*.tar.gz
-env/*.zip
 installers/*
 portable_env/
 
@@ -18,3 +15,7 @@ course_materials/day3_surrogates_gp/slides/dev/*
 !course_materials/day3_surrogates_gp/slides/dev/slides.qmd
 *.DS_Store
 .DS_Store
+
+# Jupyter-generated files
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/

@@ -41,6 +41,17 @@ permalink: /
   </section>
 
   <section class="section">
+    <h2>Practical Information</h2>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Participant Logistics</h3>
+        <p>Venue, accommodation, lunch, transport, and computing setup information is available on the <a href="{{ '/practical_information.html' | relative_url }}">Practical Information page</a>.</p>
+        <p><a class="button button-secondary" href="{{ '/practical_information.html' | relative_url }}">View Practical Information</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <h2>Overview</h2>
     <p>
       This summer school introduces machine learning as a <strong>careful engineering tool</strong>
@@ -98,7 +109,7 @@ permalink: /
       <div class="card"><h3>Day 2</h3><p>Tree ensembles for engineering tabular data, model comparison, and regime-wise diagnostics.</p></div>
       <div class="card"><h3>Day 3</h3><p>Surrogate modelling, Gaussian Processes, uncertainty, and extrapolation-aware reasoning.</p></div>
       <div class="card"><h3>Day 4</h3><p>Neural networks for tabular engineering data, limits, and lightweight physics-guided guardrails.</p></div>
-      <div class="card"><h3>Day 5</h3><p>VVUQ, safe optimisation for decision support, guest talks, programme synthesis, and closing discussion.</p></div>
+      <div class="card"><h3>Day 5</h3><p>VVUQ, uncertainty-aware optimisation, hands-on decision-support practice, and closing wrap-up.</p></div>
     </div>
   </section>
 

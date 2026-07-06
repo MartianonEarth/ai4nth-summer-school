@@ -10,6 +10,13 @@ dependencies:
   - scikit-learn
   - jupyterlab
   - notebook
+  - ipykernel
+  - joblib
+  - openpyxl
+  - pyyaml
+  - pytorch-cpu
   - pip
+  - xgboost
+  - lightgbm
   - pip:
       - mapie
