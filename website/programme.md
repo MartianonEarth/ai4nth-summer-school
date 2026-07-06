@@ -13,17 +13,17 @@ permalink: /programme.html
 
 ---
 
-## Pre-Work
+## Day 0 / Pre-Work
 
-Self-learning technical onboarding pack with virtual organiser support.
+Participants should complete the environment setup and Day 0 self-learning material before Day 1.
 
 **Supporters:** Dr Wei Wang, Dr Yu Duan
 
 Purpose: remove setup friction, support dataset orientation, align terminology and data structure, confirm the CHF case-study files and notebook structure, verify package imports and data access, and introduce the train domain / prediction domain / unsafe domain framing.
 
-Complete before Day 1.
+Complete the environment check notebook first, then run the Day 0 onboarding notebook.
 
-Outputs: run the starter notebook and sanity-check cells, produce one simple data plot, and confirm tools and data work correctly.
+Outputs: confirm the software environment works, load the CHF case-study files, run the starter notebook and sanity-check cells, and produce one simple data plot.
 
 ## Common Guidance
 
@@ -86,10 +86,9 @@ Across the week, participants will be encouraged to work in a steady engineering
 |  | 11:20-11:35 | Break |
 |  | 11:35-12:30 | **Lecture 5.3:** Optimisation: turning ML models into decisions — optimisation vocabulary, constraints, safe domain checks, uncertainty-aware objectives, and validating the optimum<br>*Lecturer: Ubaid Ali Qadri (STFC)* |
 |  | 12:30-13:30 | Lunch |
-|  | 13:30-14:00 | **Day 5 PM introduction:** guest talks, programme synthesis, and closing discussion |
-|  | 14:00-15:15 | **Two/Three Guest talks:** invited presentations on advanced or emerging topics |
-|  | 15:15-15:30 | Break |
-|  | 15:30-16:00 | **Programme synthesis and closing discussion:** key lessons from the week, participant reflections, and discussion of how the methods can be used responsibly in practice |
+|  | 13:30-14:45 | **Hands-on session:** apply the morning VVUQ and optimisation ideas to the CHF case study, including uncertainty-aware interpretation, safe-domain checks, and decision-support reasoning |
+|  | 14:45-15:00 | Break |
+|  | 15:00-15:30 | **Closing discussion:** finalise practical outputs, summarise safe-use lessons from the week, and discuss how the methods can be used responsibly in practice. The day may finish earlier if the practical work and discussion are complete. |
 
 ---
 

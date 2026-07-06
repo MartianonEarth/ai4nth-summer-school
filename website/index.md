@@ -109,7 +109,7 @@ permalink: /
       <div class="card"><h3>Day 2</h3><p>Tree ensembles for engineering tabular data, model comparison, and regime-wise diagnostics.</p></div>
       <div class="card"><h3>Day 3</h3><p>Surrogate modelling, Gaussian Processes, uncertainty, and extrapolation-aware reasoning.</p></div>
       <div class="card"><h3>Day 4</h3><p>Neural networks for tabular engineering data, limits, and lightweight physics-guided guardrails.</p></div>
-      <div class="card"><h3>Day 5</h3><p>VVUQ, safe optimisation for decision support, guest talks, programme synthesis, and closing discussion.</p></div>
+      <div class="card"><h3>Day 5</h3><p>VVUQ, uncertainty-aware optimisation, hands-on decision-support practice, and closing wrap-up.</p></div>
     </div>
   </section>
 
