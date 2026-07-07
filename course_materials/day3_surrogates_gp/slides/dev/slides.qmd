@@ -1,0 +1,755 @@
+---
+title: Gaussian Processes as Emulators
+filters:
+  - _extensions/drg-theme/direct_css.lua
+format:
+  drg-theme-revealjs: 
+    embed-resources: true
+author: Tim Rogers
+date: last-modified
+date-format: MMMM YYYY
+html-math-method:  
+    method: mathjax
+    url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+
+---
+
+## Intro
+
+```{python}
+# | echo: false
+
+from jax import vmap
+from jax import config
+from jax import numpy as jnp
+from jax import random as jr
+from jax.scipy.linalg import solve_triangular
+
+from typing import NamedTuple, Callable
+
+from matplotlib import pyplot as plt
+
+plt.rc("font", size=40)
+plt.rc("xtick", labelsize=30)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=30)  # Size of the y-tick labels
+plt.rc("lines", markersize=12)
+
+config.update("jax_enable_x64", True)
+key = jr.key(0)
+NUGGET = 1e-7
+```
+
+:::{.v-center .incremental}
+- Why do we build surrogates/emulators?
+- Problems you might have with emulators?
+  - You don't know if it matches the simulator
+  - You don't know how much data you need to fit it
+  - You **know** it won't be perfect but how bad is it?
+- In the end emulation is just a special use of regression (**personal viewpoint**)
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+def cov(kernel):
+    return vmap(vmap(kernel.k, in_axes=(None, 0)), in_axes=(0, None))
+
+
+class SE(NamedTuple):
+    sf2: float
+    ll: float
+
+    def k(self, xp, xq):
+        return self.sf2 * jnp.exp(-((xp - xq) ** 2).sum() / 2 / self.ll)
+
+
+N = 300
+sn2 = 1e-3
+x = jnp.linspace(-3.0, 3.0, N)
+sf2 = 3.0
+ll = 1.0
+kern = SE(sf2, ll)
+kxx = cov(kern)(x, x)
+L = jnp.linalg.cholesky(kxx + NUGGET * jnp.identity(N))
+
+y = L @ jr.normal(jr.key(0), (N,))
+
+_, key = jr.split(key)
+idxs = jr.choice(key, N, (8,))
+
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "bo")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_lin = jnp.hstack((x[:, None], jnp.ones_like(x[:, None])))
+y_lin = X_lin @ jnp.linalg.solve(X_lin[idxs].T @ X_lin[idxs], X_lin[idxs].T @ y[idxs])
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_quad = jnp.hstack((x[:, None] ** 2, x[:, None], jnp.ones_like(x[:, None])))
+y_quad = X_quad @ jnp.linalg.solve(
+    X_quad[idxs].T @ X_quad[idxs], X_quad[idxs].T @ y[idxs]
+)
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.plot(x, y_quad)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+X_ten = x[:, None] ** jnp.arange(7)[None]
+y_ten = X_ten @ jnp.linalg.solve(
+    X_ten[idxs].T @ X_ten[idxs] + 1e-3 * jnp.identity(X_ten.shape[1]),
+    X_ten[idxs].T @ y[idxs],
+)
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, y_lin)
+plt.plot(x, y_quad)
+plt.plot(x, y_ten)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+
+## Fitting Data
+
+:::{.v-center .h-center}
+
+```{python}
+
+ys = []
+
+for _ in range(30):
+    _, key = jr.split(key)
+    lli = jnp.exp(jr.uniform(key, minval=jnp.log(0.1), maxval=jnp.log(2.0)))
+    _, key = jr.split(key)
+    sn2 = jr.uniform(key, minval=1e-4, maxval=1e-1)
+    kern = SE(sf2, lli)
+    kt = cov(kern)(x[idxs], x[idxs]) + sn2 * jnp.identity(idxs.shape[0])
+    lt = jnp.linalg.cholesky(kt + NUGGET * jnp.identity(idxs.shape[0]))
+    ksx = cov(kern)(x, x[idxs])
+    m = ksx @ solve_triangular(
+        lt, solve_triangular(lt, y[idxs], lower=True), lower=True, trans=True
+    )
+    r = solve_triangular(lt, ksx.T, lower=True)
+    v = cov(kern)(x, x) - (r.T @ r) + NUGGET * jnp.identity(N)
+    # v = jnp.diag(jnp.diag(v))
+    _, key = jr.split(key)
+    ys.append(m[:, None] + jnp.linalg.cholesky(v) @ jr.normal(key, (N, 1)))
+ys = jnp.array(ys).transpose((1, 0, 2)).reshape((N, -1))
+
+
+plt.figure(figsize=(15, 9))
+plt.plot(x[idxs], y[idxs], "o")
+plt.plot(x, ys, "k", alpha=0.3)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(x.min(), x.max())
+plt.ylim(-5.0, 5.0)
+plt.show()
+```
+
+:::
+
+
+## What we want
+
+:::{.v-center}
+- Can we avoid needing to pick a basis?
+- Can we find a way to cover the possibility of all these functions?
+- Can we know the width of possibilities at any point in space?
+- Is there a principled way to avoid needing to fit an infinite number of functions?
+
+:::
+
+
+## The Gaussian Process
+
+::: {font-size=70px}
+::: {.callout-tip}
+## Gaussian Process
+
+A probability distribution where every sample is a function, fully defined by a **mean function** $m(x)$ and **covariance function** or *kernel* $k(x,x^\prime)$.
+
+$$
+f(x) \sim \mathcal{GP}(m(x), k(x,x^\prime))
+$$
+
+:::
+
+:::
+
+This lets us define a way to learn a whole *distribution* of functions rather than just a single "line-of-best-fit".
+
+
+## A GP on Training Data
+
+Another definition of the GP is that it is a multivariate Gaussian over infinite dimensions.
+
+
+::: {.fragment}
+
+Since any finite subset of a multivariate Gaussian is marginally also a multivariate Gaussian, we only need to work with these.
+
+:::
+
+
+::: {.fragment}
+
+If I have training data $\mathcal{D}=\{x_i, y_i\}_{i=1}^N$ and $y_i = f(x_i) + e_i$ with $e_i \sim \mathcal{N}(0, \sigma_n^2)$ then
+
+:::
+
+
+::: {.fragment}
+
+$$
+\mathbf{y} = \mathcal{N}\left(m(\mathbf{x}), K_{ff} + \sigma_n^2 \mathbb{I}\right)
+$$
+
+N.B. $\left[K_{ff}\right]_{ij} = k(x_i,x_j)$
+
+:::
+
+## Making Predictions 
+
+Our intuition will be that for inputs which are *similar* to those seen in "training" we should see outputs which are also *similar*.
+
+
+<!-- ::: {.fragment}
+
+This *similarity* is measured by the covariance function which describes the covariance of $f(x)$ and $f(x^\prime)$ as a function of $x$ and $x^\prime$ directly.
+
+:::
+ -->
+
+::: {.fragment}
+
+To make predictions of $\mathbf{y^\star}$ at new inputs $\mathbf{x^\star}=\{x_j^\star\}_{j=1}^{N^\star}$ we will look at the extended **joint** distribution between $\mathbf{y}$ and $\mathbf{y^\star}$.
+
+:::
+
+
+::: {.fragment}
+
+$$
+\begin{bmatrix}\mathbf{y}\\ \mathbf{y^\star}\end{bmatrix} = \mathcal{N}\left(\begin{bmatrix}m(\mathbf{x})\\ m(\mathbf{x^\star})\end{bmatrix}, \begin{bmatrix} K_{ff} + \sigma_n^2\mathbb{I}_N & K_{ff^\star}\\ K_{f^\star f} & K_{f^\star f^\star} + \sigma_n^2\mathbb{I}_{N^\star}\end{bmatrix}\right)
+$$
+
+:::
+
+
+
+::: {.fragment}
+
+Finally we can condition to get $p(\mathbf{y^\star} | \mathbf{y}, \mathbf{x}, \mathbf{x^\star})$
+
+$$
+\mathbf{y^\star} | \mathcal{D} \sim \mathcal{N}\left(m(\mathbf{x^\star}) + K_{f^\star f}\boldsymbol\alpha, K_{f^\star f^\star} - K_{f^\star f}\left[K_{ff} + \sigma_n^2\mathbb{I}\right]^{-1}K_{ff^\star} + \sigma_n^2\mathbb{I}\right)
+$$
+
+:::
+
+
+
+## Building a GP Emulator
+
+
+:::{.v-center}
+We now have everything (ish) to build an emulator:
+
+:::{.incremental}
+
+1. Choose $m(x)$ and $k(x,x^\prime)$
+2. Acquire $\mathcal{D}$ from a *small* number of simulator runs
+3. Validate at hold out points $\mathcal{D}_v$
+4. Predict across domain $x\in\Omega$ to get mean and covariance
+
+:::
+
+[Each of these has some challenges.]{.fragment}
+
+:::
+
+## 1. Defining the GP
+
+**The Mean Function**
+
+This is a completely free choice of any parametric function of $x$, e.g. a linear or quadratic trend. Even better if this has *physical* inductive bias. 
+
+[However, you will need to learn the parameters of this function. Easy if it is something linear ($H\Phi(x)$), harder if not.]{.fragment}
+
+[We should also be aware that it has been shown that even if the parameters of that mean function are physically meaningful, their estimate may be biased.]{.fragment}
+
+## 1. Defining the GP
+
+**The Covariance Function**
+
+The covariance function encodes our belief about the *family of functions* in this GP distribution.
+
+[We can make this simple, e.g. it's a straight line, or complex, e.g. it could be any possible polynomial. We can even use some physical knowledge here.]{.fragment}
+
+[The covariance function typically has a (small) number of *hyperparameters* to optimise.]{.fragment}
+
+## Choice of Covariance Function
+
+
+::: {layout-ncol="2" .v-center .h-center font-size=35px}
+
+Squared Exponential:
+$$
+k_\text{SE}(x, x^\prime) = \sigma_f^2 \exp\left\{-\frac{||x-x^\prime||^2_2}{2\ell^2}\right\}
+$$
+
+```{python}
+#| echo: false
+
+def sample_gp(key, kern, x, nsamp=10):
+    N = x.shape[0]
+    kxx = cov(kern)(x, x)
+    L = jnp.linalg.cholesky(kxx + NUGGET * jnp.identity(N))
+    _, key = jr.split(key)
+    return key, L @ jr.normal(key, (N, nsamp))
+
+
+x = jnp.linspace(-3.0, 3.0, N)
+kern = SE(2.0, 0.2)
+
+plt.figure(figsize=(8, 2.5))
+key, ys = sample_gp(key, kern, x)
+plt.rc("font", size=24)
+plt.rc("xtick", labelsize=24)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=24)  # Size of the y-tick labels
+plt.plot(x, ys)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.show()
+```
+
+Matérn 3/2
+$$
+k_\text{M32}(x,x^\prime) = \sigma_f^2 \left(1+\frac{\sqrt{3}d}{\ell}\right)\exp\left\{-\frac{\sqrt{3}d}{\ell}\right\}
+$$
+
+```{python}
+
+class Mat32(NamedTuple):
+    sf2: float
+    ll: float
+
+    def k(self, xp, xq):
+        r = jnp.sqrt(3) * jnp.sqrt(((xp - xq) ** 2).sum())
+        return self.sf2 * (1 + r / self.ll) * jnp.exp(-r / self.ll)
+
+
+kern = Mat32(2.0, 0.2)
+
+
+plt.figure(figsize=(8, 2.5))
+key, ys = sample_gp(key, kern, x)
+plt.rc("font", size=24)
+plt.rc("xtick", labelsize=24)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=24)  # Size of the y-tick labels
+plt.plot(x, ys)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.show()
+```
+
+:::
+
+
+## Choice of Covariance Function
+
+
+::: {layout-ncol="2" .v-center .h-center font-size=35px}
+
+
+
+
+
+Periodic
+$$
+k_\text{Per}(x, x') = \sigma^2 \exp\left( -\frac{2 \sin^2\left(\frac{\pi \vert{}x - x'\vert{}}{p}\right)}{\ell^2} \right)
+$$
+
+```{python}
+
+class Periodic(NamedTuple):
+    sf2: float
+    ll: float
+    pp: FloatingPointError
+
+    def k(self, xp, xq):
+        r = jnp.pi * jnp.sqrt(((xp - xq) ** 2).sum()) / self.pp
+        return self.sf2 * jnp.exp(-2 * jnp.sin(r) ** 2 / self.ll**2)
+
+
+kern = Periodic(2.0, 1.0, 1.5)
+
+
+plt.figure(figsize=(8, 2.5))
+key, ys = sample_gp(key, kern, x)
+plt.rc("font", size=24)
+plt.rc("xtick", labelsize=24)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=24)  # Size of the y-tick labels
+plt.plot(x, ys)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.ylim(-5, 5)
+plt.show()
+```
+
+Linear Basis
+$$
+k_\text{LB}(x, x^\prime) = \sigma_f^2 \;(\Phi(x)\cdot \Phi(x^\prime))
+$$
+
+```{python}
+
+class Linear(NamedTuple):
+    sf2: float
+    basis: Callable = lambda xx: xx
+
+    def k(self, xp, xq):
+        return self.sf2 * jnp.inner(self.basis(xp), self.basis(xq))
+
+
+basis = lambda xx: xx ** jnp.arange(4)
+kern = Linear(0.01, basis)
+
+
+plt.figure(figsize=(8, 2.5))
+key, ys = sample_gp(key, kern, x)
+plt.rc("font", size=24)
+plt.rc("xtick", labelsize=24)  # Size of the x-tick labels
+plt.rc("ytick", labelsize=24)  # Size of the y-tick labels
+plt.plot(x, ys)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.ylim(-5, 5)
+plt.show()
+```
+
+
+:::
+
+
+## 2. Collecting Data
+
+::: {.columns}
+
+::: {.column}
+
+- As we are learning a model to represent the simulator we are necessarily dependent on where we initally run the simulator
+- We want to make sure our data cover the space
+- [In higher dimensions this is more challenging, using Generalized Latin Hypercubes is an option]{.fragment fragment-index=18}
+
+:::
+
+::: {.column .v-center}
+
+
+<!-- ::: {.r-stack} -->
+
+```{python}
+#| class: "r-stack child-frag"
+
+def gp_post_diag(x, y, xs, kern):
+    C = cov(kern)
+    kxx = C(x, x)
+    ksx = C(xs, x)
+    kss = vmap(lambda xx: kern.k(xx, xx))(xs)
+
+    kt = kxx + NUGGET * jnp.identity(x.shape[0])
+    L = jnp.linalg.cholesky(kt)
+
+    m = ksx @ solve_triangular(
+        L, solve_triangular(L, y, lower=True), lower=True, trans=True
+    )
+    v = kss - (solve_triangular(L, ksx.T, lower=True) ** 2).sum(0)
+
+    return m, v
+
+
+def plot_gp(x, m, v, nsig=3, ax=None, **kwargs):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot()
+
+    ax.plot(x, m, **kwargs, label="GP Mean")
+    ax.fill_between(
+        x,
+        m - nsig * jnp.sqrt(v),
+        m + nsig * jnp.sqrt(v),
+        alpha=0.3,
+        label="GP Variance",
+        **kwargs,
+    )
+
+
+kern = SE(2.0, 1.0)
+
+_, key = jr.split(key)
+key, y = sample_gp(key, kern, x, 1)
+y = y.squeeze()
+
+plt.rc("lines", linewidth=2.0)
+fig = plt.figure()
+ax = plt.subplot()
+ax.plot(x, y, label="f(x)")
+plot_gp(x, jnp.zeros_like(x), 2.0 * jnp.ones_like(x), ax=ax)
+plt.legend(
+    loc="lower center",  # Anchor point of the legend box
+    bbox_to_anchor=(0.5, 1.02),  # Coordinates relative to the axes (x, y)
+    ncol=3,  # Number of columns (forces horizontal row)
+)
+plt.ylim(-5, 5)
+plt.title("GP Prior", y=1.5)
+plt.show()
+
+xtr = x[::20]
+ytr = y[::20]
+
+for i in range(N // 20):
+    i = i + 1
+    mi, vi = gp_post_diag(xtr[:i], ytr[:i], x, kern)
+    fig = plt.figure()
+    ax = plt.subplot()
+    ax.plot(x, y, label="f(x)")
+    plot_gp(x, mi, vi, ax=ax)
+    plt.legend(
+        loc="lower center",  # Anchor point of the legend box
+        bbox_to_anchor=(0.5, 1.02),  # Coordinates relative to the axes (x, y)
+        ncol=3,  # Number of columns (forces horizontal row)
+    )
+    plt.ylim(-5, 5)
+    if i == 1:
+        plt.title(f"GP: {i} Point", y=1.5)
+    else:
+        plt.title(f"GP: {i} Points", y=1.5)
+    plt.show()
+
+
+idxs = jnp.array([3, 5, 11])
+mi, vi = gp_post_diag(xtr[idxs], ytr[idxs], x, kern)
+fig = plt.figure()
+ax = plt.subplot()
+ax.plot(x, y, label="f(x)")
+plot_gp(x, mi, vi, ax=ax)
+plt.legend(
+    loc="lower center",  # Anchor point of the legend box
+    bbox_to_anchor=(0.5, 1.02),  # Coordinates relative to the axes (x, y)
+    ncol=3,  # Number of columns (forces horizontal row)
+)
+plt.ylim(-5, 5)
+plt.title("3 Random Points", y=1.5)
+plt.show()
+
+
+idxs = jnp.array([0, 50, 100, 150, 200, 250, 299])
+mi, vi = gp_post_diag(x[idxs], y[idxs], x, kern)
+fig = plt.figure()
+ax = plt.subplot()
+ax.plot(x, y, label="f(x)")
+plot_gp(x, mi, vi, ax=ax)
+plt.legend(
+    loc="lower center",  # Anchor point of the legend box
+    bbox_to_anchor=(0.5, 1.02),  # Coordinates relative to the axes (x, y)
+    ncol=3,  # Number of columns (forces horizontal row)
+)
+plt.ylim(-5, 5)
+plt.title("7 Distributed Points", y=1.5)
+plt.show()
+```
+
+:::
+
+
+:::
+
+
+## 3. Validation
+
+- It is generally good practice to test your emulator against some held-out data.
+- We can do the usual things, e.g. RMSE on some other points. 
+- We have the advantage of being able to evaluate uncertainty as well
+- This is still available for unseen test points
+
+
+:::{.v-center .h-center}
+```{python}
+fig = plt.figure()
+axs = fig.subplots(2, 1)
+axs[0].plot(x, y, label="f(x)")
+plot_gp(x, mi, vi, ax=axs[0])
+axs[0].set_ylabel("y")
+# plt.legend(
+#     loc="lower center",  # Anchor point of the legend box
+#     bbox_to_anchor=(0.5, 1.02),  # Coordinates relative to the axes (x, y)
+#     ncol=3,  # Number of columns (forces horizontal row)
+# )
+plt.ylim(-5, 5)
+plt.tight_layout()
+
+axs[1].plot(x, vi)
+plt.ylim(0, 0.05)
+plt.ylabel("Pred. Var.")
+plt.xlabel("x")
+plt.tight_layout()
+
+plt.show()
+```
+:::
+
+
+## 4. Prediction
+
+
+- As you have seen we can use the GP to predict at new inputs $\mathbf{x^\star}$.
+- We will talk about the *predictive distribution* from the GP, that is we get the probability $p(\mathbf{y^\star} | \mathbf{x^\star}, \mathcal{D})$
+- We get a mean prediction $\mathbb{E}\left[\mathbf{y^\star}\right]$ -  the most likely values
+- And the (co)variance of those quantities $\mathbb{V}\left[\mathbf{y^\star}\right]$ - our degree of uncertainty
+- We can then look at the marginal distributions or the joint over $\mathbf{y^\star}$.
+
+::: {.callout-warning .fragment}
+We can't guarantee that our predictions are accurate or our uncertainty is *correct*. Remember $\mathbb{V}\left[\mathbf{y^\star}\right]$ is just a function of the similarity of $\mathbf{x}$ and $\mathbf{x^\star}$.
+
+:::
+
+## What About Training?
+
+Unlike a, e.g., neural network we don't have an extensive training phase because the model is *nonparametric*. However,
+
+
+::: {.columns}
+
+::: {.column .fragment}
+
+**Hyperparameters**
+
+- Although we don't have growing numbers of parameters with model complexity
+- Our kernels typically have some *hyperparameters* to optimise
+:::
+
+::: {.column .fragment}
+
+**Computational Cost**
+
+- Rather than distilling information from training data into the model, we explicitly condition on all observed data 
+- Inverting $\left[K_{ff} + \sigma_n^2\mathbb{I}\right]$ has a cost of $\mathcal{O}(N^3)$
+
+:::
+
+:::
+
+
+## Hyperparamter Tuning
+
+This is one of the most delicate bits of fitting GPs and we have several options.
+
+1. Choose some hyperparameters based on physical knowledge
+2. Optimise for hyperparameters - use the log marginal likelihood
+$$
+p(y|X; \phi) = \int p(y|f; \phi)p(f|X; \phi) df
+$$
+3. Optimise for *maximum a posteriori* hyperparameters - include prior $p(\phi)$
+4. Infer $p(\phi|\mathcal{D})$ then marginalise over possible hyperparameters
+
+N.B. our simulators are often assumed noise free but be careful, see [Andrianakis and Challenor (2012)](https://doi.org/10.1016/j.csda.2012.04.020)
+
+## Computational Considerations
+
+Naïvely a GP will be $\mathcal{O}(N^3)$ to compute and this has been the subject of much research in the field.
+
+In the emulator setting the computation time is still orders of magnitude less than the simulator, however, memory requirements become an issue.
+
+::: {.fragment}
+
+If your dataset is large a variety of approaches exist:
+
+- Inducing point low-rank approximations (FITC, PITC, etc.)
+- Variational methods (e.g. VFE, VFF)
+- Expectation propagation / Power EP 
+- Eigen-basis expansions
+- SDE representations
+
+:::
+
+## Why Doesn't Everyone Use GPs
+
+The following are still difficult to manage (in my opinion):
+
+:::{.incremental}
+- High-dimensional outputs
+- Very high-dimensional inputs
+- Non-Gaussian likelihoods (partly)
+- Discontinous outputs
+- Non-stationary functions
+:::
+
+## Summary
+
+:::{.incremental .v-center}
+- GPs give us a principled way of fitting functions and understanding uncertainty
+- We avoid difficult training by beind nonparametric but may still be sensitive to hyperparameters
+- Computational cost can be higher (but is largely solved)
+- Be careful about your modelling assumptions (general advice!)
+:::
+
+## { .title-page }

@@ -4,6 +4,17 @@ environment/*.zip
 
 # Large binary files - do not commit to regular Git
 installers/*
+portable_env/
+
+# GP dev environment
+pyproject.toml
+.venv
+.python-version
+uv.lock
+course_materials/day3_surrogates_gp/slides/dev/*
+!course_materials/day3_surrogates_gp/slides/dev/slides.qmd
+*.DS_Store
+.DS_Store
 
 # Jupyter-generated files
 .ipynb_checkpoints/
