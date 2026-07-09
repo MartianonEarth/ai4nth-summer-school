@@ -14,6 +14,7 @@ The latest participant information is available on the public website.
 |------|------|
 | Home | https://ccp-nth.github.io/ai4nth-summer-school/ |
 | Programme | https://ccp-nth.github.io/ai4nth-summer-school/programme.html |
+| Presenters and Teaching Assistants | https://ccp-nth.github.io/ai4nth-summer-school/people.html |
 | Registration | https://ccp-nth.github.io/ai4nth-summer-school/registration.html |
 | Practical Information | https://ccp-nth.github.io/ai4nth-summer-school/practical_information.html |
 | Teaching Materials Overview | https://ccp-nth.github.io/ai4nth-summer-school/materials.html |

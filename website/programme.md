@@ -106,6 +106,8 @@ By the end of the week, participants should be able to:
 
 ## Teaching Team
 
+Presenter and teaching-assistant profiles are listed on the [People page]({{ '/people.html' | relative_url }}).
+
 **Contacts:** Prof. Michael Bluck (`m.bluck@imperial.ac.uk`), Dr Wei Wang (`wei.wang@stfc.ac.uk`), Dr Yu Duan (`yu.duan@sheffield.ac.uk`; `y.duan@imperial.ac.uk`)
 
 **TAs:** Dr Wei Wang, Dr Yu Duan, Mr Sebastian Fernandez Ruiz de las Cuevas (`s.fernandez-ruiz-de-las-cuevas25@imperial.ac.uk`)
