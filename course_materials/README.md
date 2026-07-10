@@ -11,7 +11,15 @@ Start with Day 0 after your environment check has passed:
 3. Run `day0_onboarding/Day0_self_learning_onboarding.ipynb` in JupyterLab.
 4. During the school, follow the day folder named by the course team.
 
-Released notebooks, slides, PDFs, and HTML tools are kept directly in each day folder so they are easy to find. Some days may also include `exercises/` or `solutions/` folders when separate practical tasks or reference outputs are released.
+Each day folder may contain:
+
+- `README.md` - session overview and instructions;
+- `notebooks/` - Jupyter notebooks used in lectures and practical sessions;
+- `slides/` - lecture slides;
+- `exercises/` - student-facing exercises;
+- `solutions/` - approved worked solutions or reference outputs.
+
+Day 0 and Day 1 currently keep their main student notebooks directly in the day folder so students can find them quickly. Day 2 and Day 3 keep released notebooks under `notebooks/`.
 
 ## Day Folders
 

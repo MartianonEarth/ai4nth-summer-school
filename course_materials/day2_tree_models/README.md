@@ -14,24 +14,30 @@ These materials were prepared for the AI for Nuclear Thermal Hydraulics Summer S
 - Code/notebooks: MIT License, unless otherwise stated in the file or folder.
 - Figures/data: please see individual file notices.
 
-This folder will contain material for tree-based models and structured thermal-hydraulics data.
+This folder contains material for tree-based models and structured thermal-hydraulics data.
 
 ## What Students Should Do
 
-When this material is released:
-
 1. Open this folder in JupyterLab or your file browser.
 2. Read this README for any day-specific instructions.
-3. Open the notebook, PDF, slide, or HTML file named by the course team.
-4. Follow the course guidance during the practical session.
+3. Open the notebooks under `notebooks/` when directed by the course team.
+4. Use slides or other handouts from `slides/` when directed by the course team.
+5. Follow the course guidance during the practical session.
 
-If no notebook or handout is present yet, the material has not been released.
+## Material In This Folder
+
+- `notebooks/` - Jupyter notebooks used for the Day 2 practical session.
+- `slides/` - lecture slides.
+- `exercises/` - student-facing exercises, if released separately.
+- `solutions/` - approved worked solutions or reference outputs, if released.
+- `README.md` - this session overview and instructions.
 
 ## For Lecturers
 
 This section is for lecturers and organisers preparing this day.
 
-- Add released notebooks, slides, PDFs, and HTML tools directly to this day folder.
+- Add released notebooks to `notebooks/` unless the course team decides a root-level notebook is clearer for students.
+- Add released slides to `slides/`.
 - Use `exercises/` for separate student-facing practical tasks when needed.
 - Use `solutions/` for worked solutions or reference outputs only when approved for release.
 - Keep notebooks runnable on standard laptops.
