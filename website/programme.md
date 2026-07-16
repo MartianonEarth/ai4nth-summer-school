@@ -86,9 +86,7 @@ Across the week, participants will be encouraged to work in a steady engineering
 |  | 11:20-11:35 | Break |
 |  | 11:35-12:30 | **Lecture 5.3:** Optimisation: turning ML models into decisions — optimisation vocabulary, constraints, safe domain checks, uncertainty-aware objectives, and validating the optimum<br>*Lecturer: Ubaid Ali Qadri (STFC)* |
 |  | 12:30-13:30 | Lunch |
-|  | 13:30-14:45 | **Hands-on session:** apply the morning VVUQ and optimisation ideas to the CHF case study, including uncertainty-aware interpretation, safe-domain checks, and decision-support reasoning |
-|  | 14:45-15:00 | Break |
-|  | 15:00-15:30 | **Closing discussion:** finalise practical outputs, summarise safe-use lessons from the week, and discuss how the methods can be used responsibly in practice. The day may finish earlier if the practical work and discussion are complete. |
+|  | 13:00-14:00 | **Closing discussion:** finalise practical outputs, summarise safe-use lessons from the week, and discuss how the methods can be used responsibly in practice. The day may finish earlier if the practical work and discussion are complete. |
 
 ---
 
